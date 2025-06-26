@@ -10,6 +10,7 @@ import AuthScreen from "../screens/AuthScreen";
 import { useAuthStore } from "../store/useAuthStore";
 import { ActivityIndicator, View } from "react-native";
 import tw from "../tailwind";
+import LiveTranscription from "../liveTranscription";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -43,6 +44,10 @@ export default function AppNavigator() {
             <Stack.Screen
               name="AppointmentDetail"
               component={AppointmentDetailScreen}
+            />
+            <Stack.Screen
+              name="LiveTranscription"
+              component={LiveTranscription}
             />
             <Stack.Screen
               name="AudioTranscription"

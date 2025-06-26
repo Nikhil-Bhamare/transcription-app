@@ -8,4 +8,5 @@ export type RootStackParamList = {
   AppointmentDetail: undefined;
   AudioTranscription: { fileUri: string };
   Auth: undefined;
+  LiveTranscription:undefined
 };
