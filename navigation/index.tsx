@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ScheduleAppointmentScreen } from "../screens/ScheduleAppointmentScreen";
 import { AppointmentDetailScreen } from "../screens/AppointmentDetailScreen";
 import BottomTabs from "./BottomTabs";
+import { AudioTranscription } from "../screens/AudioTranscription";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { RootStackParamList } from "./types"; // adjust the path as needed
 import AuthScreen from "../screens/AuthScreen";
 import { useAuthStore } from "../store/useAuthStore";
 import { ActivityIndicator, View } from "react-native";
 import tw from "../tailwind";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
   const { isLoggedIn, checkLoginStatus } = useAuthStore();
@@ -41,6 +43,10 @@ export default function AppNavigator() {
             <Stack.Screen
               name="AppointmentDetail"
               component={AppointmentDetailScreen}
+            />
+            <Stack.Screen
+              name="AudioTranscription"
+              component={AudioTranscription}
             />
           </>
         ) : (

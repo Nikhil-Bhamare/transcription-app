@@ -6,12 +6,16 @@ import {
   SafeAreaView,
   ScrollView,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import tw from "../tailwind";
 import Button from "../components/Button";
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
+import BackButton from "../components/BackButton";
+import GenderDropdown from "../components/GenderDropdown";
+import { Feather } from "@expo/vector-icons";
 
 export const ScheduleAppointmentScreen = () => {
   const [patientName, setPatientName] = useState("");
@@ -53,7 +57,6 @@ export const ScheduleAppointmentScreen = () => {
   const handleSubmit = () => {
     if (patientName && contactNumber && age && gender) {
       // API call or state update here
-      alert("Appointment scheduled!");
       navigation.navigate("AppointmentDetail" as never);
     } else {
       alert("Please fill all required fields.");
@@ -61,11 +64,12 @@ export const ScheduleAppointmentScreen = () => {
   };
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-gray-100`}>
+    <SafeAreaView style={tw`flex-1 bg-[#fbfaf5]`}>
       <ScrollView contentContainerStyle={tw`p-6 pb-16`}>
+        <BackButton />
         <Text style={tw`text-2xl font-bold mb-6`}>Schedule Appointment</Text>
 
-        <Text style={tw`mb-1`}>Patient Name *</Text>
+        <Text style={tw`mb-1 text-base font-semibold`}>Patient Name *</Text>
         <TextInput
           value={patientName}
           onChangeText={setPatientName}
@@ -73,7 +77,7 @@ export const ScheduleAppointmentScreen = () => {
           placeholder="Enter patient name"
         />
 
-        <Text style={tw`mb-1`}>Contact Number *</Text>
+        <Text style={tw`mb-1 text-base font-semibold`}>Contact Number *</Text>
         <TextInput
           value={contactNumber}
           onChangeText={setContactNumber}
@@ -82,72 +86,86 @@ export const ScheduleAppointmentScreen = () => {
           keyboardType="phone-pad"
         />
 
-        <Text style={tw`mb-1`}>Age *</Text>
-        <TextInput
-          value={age}
-          onChangeText={setAge}
-          style={tw`border border-gray-300 rounded-lg p-3 bg-white mb-4`}
-          placeholder="Enter age"
-          keyboardType="numeric"
-        />
+        <View style={tw`flex-row gap-4 mb-4`}>
+          <View style={tw`flex-1`}>
+            <Text style={tw`mb-1 text-base font-semibold`}>Age *</Text>
+            <TextInput
+              value={age}
+              onChangeText={setAge}
+              style={tw`border border-gray-300 rounded-lg p-3 bg-white`}
+              placeholder="Enter age"
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={tw`flex-1`}>
+            <GenderDropdown value={gender} onChange={setGender} />
+          </View>
+        </View>
 
-        <Text style={tw`mb-1`}>Gender *</Text>
-        <RNPickerSelect
-          onValueChange={setGender}
-          items={[
-            { label: "Male", value: "male" },
-            { label: "Female", value: "female" },
-            { label: "Other", value: "other" },
-          ]}
-          placeholder={{ label: "Select gender", value: "" }}
-          style={{
-            inputIOS: tw`border border-gray-300 rounded-lg p-3 bg-white mb-4`,
-            inputAndroid: tw`border border-gray-300 rounded-lg p-3 bg-white mb-4`,
-          }}
-          value={gender}
-        />
+        <View style={tw`flex-row gap-4 mb-4`}>
+          <View style={tw`flex-1 mb-4`}>
+            <Text style={tw`mb-1 text-base font-semibold`}>Date *</Text>
 
-        <Text style={tw`mb-1`}>Date *</Text>
-        <TextInput
-          value={formatDate(date)}
-          onFocus={() => setShowDate(true)}
-          style={tw`border border-gray-300 rounded-lg p-3 bg-white mb-4`}
-        />
-        {showDate && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
+            <TouchableOpacity
+              onPress={() => setShowDate(true)}
+              style={tw`border border-gray-300 rounded-lg p-3 bg-white flex-row items-center justify-between`}
+            >
+              <Text style={tw`text-base text-gray-800`}>
+                {date ? formatDate(date) : "Select date"}
+              </Text>
+              <Feather name="calendar" size={20} color="#888" />
+            </TouchableOpacity>
+
+            {showDate && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={handleDateChange}
+              />
+            )}
+          </View>
+          <View style={tw`flex-1 mb-4`}>
+            <Text style={tw`mb-1 text-base font-semibold`}>Time Slot *</Text>
+
+            <TouchableOpacity
+              onPress={() => setShowTime(true)}
+              style={tw`border border-gray-300 rounded-lg p-3 bg-white flex-row items-center justify-between`}
+            >
+              <Text style={tw`text-base text-gray-800`}>
+                {date ? formatTime(date) : "Select time"}
+              </Text>
+              <Feather name="clock" size={20} color="#888" />
+            </TouchableOpacity>
+
+            {showTime && (
+              <DateTimePicker
+                value={date}
+                mode="time"
+                display="default"
+                onChange={handleTimeChange}
+              />
+            )}
+          </View>
+        </View>
+
+        <View>
+          <Text style={tw`mb-1 text-base font-semibold`}>Description *</Text>
+          <TextInput
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={4}
+            placeholder="Add description"
+            style={[
+              tw`border border-gray-300 rounded-lg p-3 bg-white text-base`,
+              { minHeight: 100, textAlignVertical: "top" }, // acts like textarea
+            ]}
           />
-        )}
-
-        <Text style={tw`mb-1`}>Time Slot *</Text>
-        <TextInput
-          value={formatTime(date)}
-          onFocus={() => setShowTime(true)}
-          style={tw`border border-gray-300 rounded-lg p-3 bg-white mb-4`}
-        />
-        {showTime && (
-          <DateTimePicker
-            value={date}
-            mode="time"
-            display="default"
-            onChange={handleTimeChange}
-          />
-        )}
-
-        <Text style={tw`mb-1`}>Description</Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={4}
-          style={tw`border border-gray-300 rounded-lg p-3 bg-white text-base`}
-          placeholder="Add description"
-        />
-
-        <Button title="Schedule Appointment" onPress={handleSubmit} />
+        </View>
+        <View style={tw`mt-12 text-base font-semibold`}>
+          <Button title="Schedule Appointment" onPress={handleSubmit} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
