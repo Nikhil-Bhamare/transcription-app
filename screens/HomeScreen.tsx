@@ -12,6 +12,7 @@ import {
 import tw from "../tailwind";
 import { Feather } from "@expo/vector-icons";
 import AppointmentCTA from "../components/AppointmentCTA";
+import { useNavigation } from "@react-navigation/native";
 
 const mockAppointments = [
   {
@@ -64,6 +65,8 @@ const getStatusColor = (status: string) => {
 };
 
 export const HomeScreen = () => {
+  const navigation = useNavigation();
+
   const renderItem = ({ item }: any) => (
     <View style={tw`bg-white rounded-xl border border-gray-200 p-4 mb-4`}>
       <View style={tw`flex-row items-start justify-between mb-3`}>
@@ -101,7 +104,9 @@ export const HomeScreen = () => {
       </View>
 
       <View style={tw`border-t border-gray-200 pt-2 items-end`}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("AppointmentDetail" as never)}
+        >
           <Text style={tw`text-blue-600 text-sm font-medium underline`}>
             View Details
           </Text>

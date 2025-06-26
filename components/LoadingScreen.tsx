@@ -4,9 +4,8 @@ import tw from "twrnc";
 
 const messages = [
   "🔍 Getting your file...",
-  "📊 Analyzing data...",
-  "🧠 Understanding medical terms...",
   "✍️ Transcribing audio...",
+  "🧠 Understanding medical terms...",
   "📄 Generating insights...",
 ];
 
@@ -17,7 +16,7 @@ interface Props {
 
 const LoadingScreen: React.FC<Props> = ({
   spinnerColor = "#3B82F6",
-  interval = 2000,
+  interval = 3000,
 }) => {
   const [index, setIndex] = useState(0);
 
