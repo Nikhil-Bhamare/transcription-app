@@ -6,6 +6,8 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import tw from "../tailwind";
 import { useNavigation } from "@react-navigation/native";
@@ -52,32 +54,56 @@ export const HomeScreen = () => {
   );
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-gray-100 py-8`}>
-      <View style={tw`px-6 pt-6 flex-1`}>
-        <Text style={tw`text-2xl font-bold mb-1`}>Welcome, Dr. Olivia</Text>
+    <SafeAreaView style={tw`flex-1 bg-gray-100`}>
+      <KeyboardAvoidingView
+        style={tw`flex-1`}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={tw`px-6 pt-6 flex-1`}>
+          <Text style={tw`text-2xl font-bold mb-1`}>
+            Welcome, Dr. Olivia 👋
+          </Text>
 
-        <TextInput
-          placeholder="Search patient name"
-          style={tw`bg-white mt-4 mb-4 p-3 rounded-lg border border-gray-300`}
-        />
+          <TextInput
+            placeholder="Search patient name"
+            style={tw`bg-white mt-4 mb-4 p-3 rounded-lg border border-gray-300`}
+          />
 
-        <View style={tw`flex-row justify-between items-center mb-2`}>
-          <Text style={tw`text-lg font-semibold`}>Appointment Management</Text>
-          <TouchableOpacity
-            style={tw`bg-green-600 px-4 py-2 rounded-lg`}
-            onPress={() => navigation.navigate("ScheduleAppointment" as never)}
+          <View
+            style={tw`bg-[#3b82f6] rounded-xl p-4 flex-row justify-between items-center mb-6`}
           >
-            <Text style={tw`text-white font-semibold`}>Schedule</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={tw`flex-1`}>
+              <Text style={tw`text-white font-semibold text-base mb-1`}>
+                Appointment Management
+              </Text>
+              <Text style={tw`text-white text-xs opacity-80 mb-2`}>
+                Assign time slots and manage appointments easily.
+              </Text>
+              <TouchableOpacity
+                style={tw`bg-white px-4 py-2 rounded-full self-start`}
+                onPress={() =>
+                  navigation.navigate("ScheduleAppointment" as never)
+                }
+              >
+                <Text style={tw`text-blue-600 font-semibold text-sm`}>
+                  Schedule Appointment
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {/* You can add doctor image here if needed */}
+          </View>
 
-        <FlatList
-          data={mockAppointments}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={tw`pb-16`}
-        />
-      </View>
+          <Text style={tw`text-lg font-semibold mb-4`}>View Appointment</Text>
+
+          <FlatList
+            data={mockAppointments}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={tw`pb-24`}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
