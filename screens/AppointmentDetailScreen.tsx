@@ -74,14 +74,6 @@ export const AppointmentDetailScreen = () => {
             <Text style={tw`font-semibold`}>Contact Number:</Text> +91
             8899277284
           </Text>
-          <View style={tw`flex-row justify-between mb-2`}>
-            <Text style={tw`text-gray-800 text-sm`}>
-              <Text style={tw`font-semibold`}>Age:</Text> 26
-            </Text>
-            <Text style={tw`text-gray-800 text-sm`}>
-              <Text style={tw`font-semibold`}>Gender:</Text> Male
-            </Text>
-          </View>
           {/* Description */}
           <Text style={tw`font-semibold text-sm mb-1`}>Description:</Text>
           <Text style={tw`text-gray-700 text-sm`}>

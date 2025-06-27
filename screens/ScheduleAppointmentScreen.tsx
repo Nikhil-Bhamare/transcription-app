@@ -55,7 +55,7 @@ export const ScheduleAppointmentScreen = () => {
     }`;
 
   const handleSubmit = () => {
-    if (patientName && contactNumber && age && gender) {
+    if (patientName && contactNumber) {
       // API call or state update here
       navigation.navigate("AppointmentDetail" as never);
     } else {
@@ -85,22 +85,6 @@ export const ScheduleAppointmentScreen = () => {
           placeholder="Enter contact number"
           keyboardType="phone-pad"
         />
-
-        <View style={tw`flex-row gap-4 mb-4`}>
-          <View style={tw`flex-1`}>
-            <Text style={tw`mb-1 text-base font-semibold`}>Age *</Text>
-            <TextInput
-              value={age}
-              onChangeText={setAge}
-              style={tw`border border-gray-300 rounded-lg p-3 bg-white`}
-              placeholder="Enter age"
-              keyboardType="numeric"
-            />
-          </View>
-          <View style={tw`flex-1`}>
-            <GenderDropdown value={gender} onChange={setGender} />
-          </View>
-        </View>
 
         <View style={tw`flex-row gap-4 mb-4`}>
           <View style={tw`flex-1 mb-4`}>
