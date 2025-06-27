@@ -11,12 +11,41 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import tw from "../tailwind";
 import LoginTab from "./AuthTabs/LoginTab";
 import OTPTab from "./AuthTabs/OTPTab";
+import { Dimensions } from "react-native";
+import Svg, { Circle } from "react-native-svg";
+
+const { width, height } = Dimensions.get("window");
+
+const halfWidth = width / 2;
+const halfHeight = height / 2;
 
 export const AuthScreen = () => {
   const [activeTab, setActiveTab] = useState<"login" | "otp">("login");
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-[#0B1E3D]`}>
+    <SafeAreaView style={tw`flex-1 bg-gray-800`}>
+      <Svg
+        height={halfHeight}
+        width={width}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        {/* Dark blue full background */}
+        <Circle cx={halfWidth} cy={0} r={halfHeight} fill="#0B1220" />
+        {/* Faded radial circle */}
+        <Circle
+          cx={halfWidth * 0.8}
+          cy={halfHeight * 0.1}
+          r={halfHeight * 0.6}
+          fill="#1C2332"
+        />
+
+        <Circle
+          cx={halfWidth * 0.7}
+          cy={halfHeight * 0.1}
+          r={halfHeight * 0.45}
+          fill="#1E2638"
+        />
+      </Svg>
       <View style={tw`flex-1 justify-end`}>
         <Text style={tw`text-white text-2xl font-bold px-6 mb-1`}>
           {activeTab === "login"

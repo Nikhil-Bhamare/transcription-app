@@ -3,11 +3,9 @@ import {
   View,
   Text,
   SafeAreaView,
-  FlatList,
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
+  ScrollView,
 } from "react-native";
 import tw from "../tailwind";
 import { Feather } from "@expo/vector-icons";
@@ -41,7 +39,7 @@ const mockAppointments = [
   },
   {
     id: "4",
-    name: "Dr. Alex Roy",
+    name: "Alex Roy",
     phone: "+91 9988776655",
     status: "Pending",
     date: "18/06/2025",
@@ -67,14 +65,19 @@ const getStatusColor = (status: string) => {
 export const HomeScreen = () => {
   const navigation = useNavigation();
 
-  const renderItem = ({ item }: any) => (
-    <View style={tw`bg-white rounded-xl border border-gray-200 p-4 mb-4`}>
+  const renderItem = (item: any) => (
+    <View
+      key={item.id}
+      style={tw`bg-white rounded-xl border border-gray-200 p-4 mb-4`}
+    >
       <View style={tw`flex-row items-start justify-between mb-3`}>
         <View style={tw`flex-row items-center`}>
           <View
             style={tw`w-10 h-10 rounded-full bg-blue-600 items-center justify-center mr-3`}
           >
-            <Text style={tw`text-white font-semibold`}>UU</Text>
+            <Text style={tw`text-white font-semibold`}>
+              {item?.name?.charAt(0).toUpperCase() || "U"}
+            </Text>
           </View>
           <View>
             <Text style={tw`text-black font-semibold text-base`}>
@@ -116,47 +119,45 @@ export const HomeScreen = () => {
   );
 
   return (
-    <SafeAreaView style={tw`flex-1 bg-[#fbfaf5] pt-6`}>
-      <KeyboardAvoidingView
-        style={tw`flex-1`}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <View style={tw`px-6 pt-6 flex-1`}>
-          <View style={tw`flex-row items-center justify-between mb-4`}>
-            <Text style={tw`text-xl font-bold`} numberOfLines={1}>
-              Welcome, Dr. Olvia 👋
-            </Text>
-            <View style={tw`relative w-7 h-7 items-center justify-center`}>
-              <Feather name="bell" size={28} color="#000" />
-              <View
-                style={tw`absolute top-0 right-0 h-3 w-3 bg-red-600 rounded-full border-2 border-white`}
-              />
-            </View>
-          </View>
-
-          <View
-            style={tw`flex-row items-center bg-white mt-4 mb-4 p-3 rounded-lg border border-gray-300`}
-          >
-            <Feather name="search" size={20} color="#000" style={tw`mr-2`} />
-            <TextInput
-              placeholder="Search patient name"
-              style={tw`flex-1 text-base text-gray-800 p-0`}
+    <SafeAreaView style={tw`flex-1 bg-[#fbfaf5] pt-8`}>
+      {/* Fixed Header */}
+      <View style={[tw`bg-[#fbfaf5] px-6 pt-4`]}>
+        <View style={tw`flex-row items-center justify-between`}>
+          <Text style={tw`text-xl font-bold`} numberOfLines={1}>
+            Welcome, Dr. Olvia 👋
+          </Text>
+          <View style={tw`relative w-7 h-7 items-center justify-center`}>
+            <Feather name="bell" size={28} color="#000" />
+            <View
+              style={tw`absolute top-0 right-0 h-3 w-3 bg-red-600 rounded-full border-2 border-white`}
             />
           </View>
-
-          <AppointmentCTA />
-
-          <Text style={tw`text-xl font-bold mb-4`}>View Appointment</Text>
-
-          <FlatList
-            data={mockAppointments}
-            keyExtractor={(item) => item.id}
-            renderItem={renderItem}
-            contentContainerStyle={tw`pb-24`}
-            showsVerticalScrollIndicator={false}
+        </View>
+        <View
+          style={tw`flex-row items-center bg-white mt-4 mb-4 p-3 rounded-lg border border-gray-300`}
+        >
+          <Feather name="search" size={20} color="#000" style={tw`mr-2`} />
+          <TextInput
+            placeholder="Search patient name"
+            style={tw`flex-1 text-base text-gray-800 p-0`}
           />
         </View>
-      </KeyboardAvoidingView>
+      </View>
+
+      {/* Scrollable Content */}
+      <ScrollView
+        contentContainerStyle={[tw`px-6`]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Search */}
+
+        {/* CTA */}
+        <AppointmentCTA />
+
+        {/* Appointment List */}
+        <Text style={tw`text-xl font-bold mb-4`}>View Appointment</Text>
+        {mockAppointments.map(renderItem)}
+      </ScrollView>
     </SafeAreaView>
   );
 };
