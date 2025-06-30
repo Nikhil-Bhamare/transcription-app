@@ -56,9 +56,9 @@ const NetworkStatusBanner = () => {
       pointerEvents="none"
       style={[styles.container, { opacity: fadeAnim }]}
     >
-      <SafeAreaView style={tw`px-3`}>
+      <SafeAreaView style={tw`px-3 py-1 gap-1`}>
         <Text style={tw`text-white text-center font-semibold text-sm`}>
-          ⚠️ Check your internet connection.
+          ⚠️ &nbsp; No Internet Connection
         </Text>
       </SafeAreaView>
     </Animated.View>
