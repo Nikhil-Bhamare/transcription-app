@@ -12,7 +12,7 @@ import React, { useEffect, useRef, useState } from "react";
 import tw from "twrnc";
 import { Feather } from "@expo/vector-icons";
 import { AudioModule, RecordingPresets, useAudioRecorder } from "expo-audio";
-import InputField from "./components/InputField";
+import { addEventListener } from "@react-native-community/netinfo";
 
 type Report = {
   patient_name?: string | null;
@@ -179,7 +179,6 @@ const LiveTranscription = () => {
       <ScrollView style={tw`h-full bg-gray-200`}>
         <View style={tw`flex p-6 w-full h-full gap-10`}>
           <Text style={tw`text-2xl font-bold`}>Live Transcription</Text>
-          <TextInput style={tw`bg-red-100 w-full h-10`} />
 
           <View
             style={tw`p-4 gap-4 bg-white flex justify-between h-80 w-full rounded-xl shadow-sm border border-gray-300`}
