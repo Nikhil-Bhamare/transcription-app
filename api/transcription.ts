@@ -1,10 +1,12 @@
+import axios from "axios";
+
 export const fetchTranscriptionData = async (
   fileUri: string,
   uid: string = "12345"
 ): Promise<any> => {
   const formData = new FormData();
 
-  const fileExtension = fileUri.split(".").pop();
+  const fileExtension = fileUri.split(".").pop()?.toLowerCase();
   const mimeType =
     fileExtension === "mp4"
       ? "video/mp4"
@@ -16,21 +18,24 @@ export const fetchTranscriptionData = async (
     uri: fileUri,
     name: `upload.${fileExtension}`,
     type: mimeType,
-  } as any);
+  } as any); // "as any" needed for React Native file object
 
   formData.append("uid", uid);
 
-  const response = await fetch(
-    "https://dev-medical-transcription-ai-model.huhoka.com/transcription_individual/",
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+  try {
+    const response = await axios.post(
+      "https://dev-medical-transcription-ai-model.huhoka.com/transcription_individual/",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-  if (!response.ok) {
+    return response.data;
+  } catch (error: any) {
+    console.error("Transcription upload error:", error.message);
     throw new Error("Failed to fetch transcription data");
   }
-
-  return response.json();
 };
