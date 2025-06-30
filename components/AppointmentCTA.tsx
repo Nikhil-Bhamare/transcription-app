@@ -12,21 +12,21 @@ const AppointmentCTA = () => {
       colors={["#1D4ED8", "#2563EB"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      style={tw`flex-row rounded-xl px-4 py-5 my-4 items-center`}
+      style={tw`flex-row rounded-xl my-2 items-center`}
     >
       {/* Doctor Image */}
       <Image
-        source={require("../assets/doctorImg.png")}
-        style={tw`w-22 h-36 rounded-lg mr-4`}
+        source={require("../assets/Doctor1.png")}
+        style={tw`w-28 h-36 rounded-lg mr-4`}
         resizeMode="cover"
       />
 
       {/* Text and Button */}
-      <View style={tw`ml-2 flex-1`}>
-        <Text style={tw`text-white text-[13px] font-bold`}>
+      <View style={tw`flex-1`}>
+        <Text style={tw`text-white text-md font-bold`}>
           Appointment Management
         </Text>
-        <Text style={tw`text-white text-[12px] my-2 leading-tight`}>
+        <Text style={tw`text-white text-xs my-2 leading-tight`}>
           Assign time slots and manage appointments easily.
         </Text>
         <TouchableOpacity

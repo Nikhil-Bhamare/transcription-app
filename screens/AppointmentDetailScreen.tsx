@@ -24,7 +24,7 @@ export const AppointmentDetailScreen = () => {
 
   return (
     <SafeAreaView style={tw`flex-1 bg-[#fbfaf5]`}>
-      <ScrollView contentContainerStyle={tw`p-6 py-20`}>
+      <ScrollView contentContainerStyle={tw`p-6`}>
         <BackButton />
         <Text style={tw`text-xl font-bold mb-4`}>View Appointment Details</Text>
         {/* Buttons */}
