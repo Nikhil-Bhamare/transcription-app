@@ -12,7 +12,8 @@ import React, { useEffect, useRef, useState } from "react";
 import tw from "twrnc";
 import { Feather } from "@expo/vector-icons";
 import { AudioModule, RecordingPresets, useAudioRecorder } from "expo-audio";
-import { addEventListener } from "@react-native-community/netinfo";
+import { Audio } from "expo-av";
+import Voice from "@react-native-voice/voice";
 
 type Report = {
   patient_name?: string | null;
@@ -35,6 +36,26 @@ const LiveTranscription = () => {
   const socketRef = useRef<WebSocket | null>(null);
   let scrollViewRef: ScrollView | null = null;
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const [isOffline, setIsOffline] = useState(true);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [audioUri, setAudioUri] = useState<string | null>(null); // Add state for audio URI
+
+  useEffect(() => {
+    Voice.onSpeechResults = (event) => {
+      if (event.value) {
+        setTranscription(event.value.join(" "));
+      }
+    };
+
+    Voice.onSpeechError = (e) => {
+      console.error("Speech error:", e);
+    };
+
+    return () => {
+      Voice.destroy().then(Voice.removeAllListeners);
+    };
+  }, []);
 
   useEffect(() => {
     if (isRecording) {
@@ -62,6 +83,51 @@ const LiveTranscription = () => {
       if (socketRef.current) socketRef.current.close();
     };
   }, []);
+
+  const startOffline = async () => {
+    try {
+      setLoading("Starting");
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      // Prepare audio recording
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+      setRecording(recording);
+      setAudioUri(null); // Reset audio URI on new recording
+
+      // Start speech recognition
+      await Voice.start("en-US");
+      setIsListening(true);
+      setIsRecording(true);
+      setLoading("");
+    } catch (e) {
+      console.error("Error starting both:", e);
+    }
+  };
+
+  const stopOffline = async () => {
+    try {
+      if (recording) {
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI();
+        console.log("Audio file saved at:", uri);
+        setAudioUri(uri || null); // Save audio URI for playback
+        setRecording(null);
+      }
+
+      if (isListening) {
+        await Voice.stop();
+        setIsListening(false);
+      }
+      setIsRecording(false);
+    } catch (e) {
+      console.error("Error stopping both:", e);
+    }
+  };
 
   const formatTimer = (seconds: number) => {
     const h = Math.floor(seconds / 3600)
@@ -195,15 +261,22 @@ const LiveTranscription = () => {
               style={tw`bg-gray-100 rounded-lg p-2`}
             >
               <Text style={tw`text-lg`}>
-                {transcription || "Start recording to see"}
+                {transcription ? transcription : "Start recording to see"}
               </Text>
             </ScrollView>
             <View style={tw`flex gap-4`}>
               <View style={tw`w-full h-[1px] bg-gray-400`}></View>
               <View style={tw`flex flex-row justify-between items-center`}>
+                {/* Start/Stop button for offline/online */}
                 <TouchableOpacity
                   disabled={!!loading}
-                  onPress={() => (isRecording ? stopRecording() : record())}
+                  onPress={() => {
+                    if (isOffline) {
+                      isRecording ? stopOffline() : startOffline();
+                    } else {
+                      isRecording ? stopRecording() : record();
+                    }
+                  }}
                   style={tw`${
                     isRecording ? "bg-red-400" : "bg-blue-500"
                   } p-3 px-4 rounded-lg text-black`}
@@ -234,90 +307,103 @@ const LiveTranscription = () => {
               </View>
             </View>
           </View>
-
-          {!report ||
-          (!report?.patient_name &&
-            !report?.age &&
-            !report?.assessment &&
-            !report?.chief_complaint &&
-            !report?.gender &&
-            !report?.patient_name &&
-            !report?.history_of_present_illness) ? (
-            <View
-              style={tw`p-4 bg-white flex justify-between w-full rounded-xl shadow-sm border border-gray-300`}
-            >
-              <View style={tw`flex my-auto gap-2 bg-gray-100 rounded-lg p-2`}>
-                <Text style={tw`text-center`}>No report available</Text>
-              </View>
-            </View>
-          ) : (
-            <View
-              style={tw`p-4 bg-white flex justify-between w-full rounded-xl shadow-sm border border-gray-300`}
-            >
-              <View style={tw`flex gap-2 bg-gray-100 rounded-lg p-2 mb-3`}>
-                {report?.patient_name && (
-                  <View style={tw`flex`}>
-                    <Text style={tw`text-lg font-semibold`}>Patient Name</Text>
-                    <Text style={tw`text-lg`}>{report?.patient_name}</Text>
-                  </View>
-                )}
-                {report?.age && (
-                  <View style={tw`flex`}>
-                    <Text style={tw`text-lg font-semibold`}>Age</Text>
-                    <Text style={tw`text-lg`}>{report?.age}</Text>
-                  </View>
-                )}
-                {report?.gender && (
-                  <View style={tw`flex`}>
-                    <Text style={tw`text-lg font-semibold`}>Gender</Text>
-                    <Text style={tw`text-lg`}>{report?.gender}</Text>
-                  </View>
-                )}
-                {report?.assessment && (
-                  <View style={tw`flex`}>
-                    <Text style={tw`text-lg font-semibold`}>Assessment</Text>
-                    <Text style={tw`text-lg`}>{report?.assessment}</Text>
-                  </View>
-                )}
-                {report?.chief_complaint && (
-                  <View style={tw`flex`}>
-                    <Text style={tw`text-lg font-semibold`}>
-                      Chief Complaint
-                    </Text>
-                    <Text style={tw`text-lg`}>{report?.chief_complaint}</Text>
-                  </View>
-                )}
-                {report?.history_of_present_illness && (
-                  <View style={tw`flex`}>
-                    <Text style={tw`text-lg font-semibold`}>
-                      History of present illness:
-                    </Text>
-                    <Text style={tw`text-lg`}>
-                      {report?.history_of_present_illness}
-                    </Text>
-                  </View>
-                )}
-                {report?.plan && (
-                  <View style={tw`flex`}>
-                    <Text style={tw`text-lg font-semibold`}>Plan</Text>
-                    <Text style={tw`text-lg`}>{report?.plan}</Text>
-                  </View>
-                )}
-              </View>
-              <View style={tw` flex gap-4`}>
-                <View style={tw`w-full h-[1px] bg-gray-400`}></View>
-                <View style={tw`flex flex-row items-center justify-between`}>
-                  <TouchableOpacity
-                    style={tw`bg-blue-500 p-3 px-4 rounded-lg text-black`}
+          {!isOffline && (
+            <>
+              {!report ||
+              (!report?.patient_name &&
+                !report?.age &&
+                !report?.assessment &&
+                !report?.chief_complaint &&
+                !report?.gender &&
+                !report?.patient_name &&
+                !report?.history_of_present_illness) ? (
+                <View
+                  style={tw`p-4 bg-white flex justify-between w-full rounded-xl shadow-sm border border-gray-300`}
+                >
+                  <View
+                    style={tw`flex my-auto gap-2 bg-gray-100 rounded-lg p-2`}
                   >
-                    <Text style={tw`text-white font-semibold`}>
-                      Generate Report
-                    </Text>
-                  </TouchableOpacity>
-                  <Feather name="download" size={24} color="black" />
+                    <Text style={tw`text-center`}>No report available</Text>
+                  </View>
                 </View>
-              </View>
-            </View>
+              ) : (
+                <View
+                  style={tw`p-4 bg-white flex justify-between w-full rounded-xl shadow-sm border border-gray-300`}
+                >
+                  <View style={tw`flex gap-2 bg-gray-100 rounded-lg p-2 mb-3`}>
+                    {report?.patient_name && (
+                      <View style={tw`flex`}>
+                        <Text style={tw`text-lg font-semibold`}>
+                          Patient Name
+                        </Text>
+                        <Text style={tw`text-lg`}>{report?.patient_name}</Text>
+                      </View>
+                    )}
+                    {report?.age && (
+                      <View style={tw`flex`}>
+                        <Text style={tw`text-lg font-semibold`}>Age</Text>
+                        <Text style={tw`text-lg`}>{report?.age}</Text>
+                      </View>
+                    )}
+                    {report?.gender && (
+                      <View style={tw`flex`}>
+                        <Text style={tw`text-lg font-semibold`}>Gender</Text>
+                        <Text style={tw`text-lg`}>{report?.gender}</Text>
+                      </View>
+                    )}
+                    {report?.assessment && (
+                      <View style={tw`flex`}>
+                        <Text style={tw`text-lg font-semibold`}>
+                          Assessment
+                        </Text>
+                        <Text style={tw`text-lg`}>{report?.assessment}</Text>
+                      </View>
+                    )}
+                    {report?.chief_complaint && (
+                      <View style={tw`flex`}>
+                        <Text style={tw`text-lg font-semibold`}>
+                          Chief Complaint
+                        </Text>
+                        <Text style={tw`text-lg`}>
+                          {report?.chief_complaint}
+                        </Text>
+                      </View>
+                    )}
+                    {report?.history_of_present_illness && (
+                      <View style={tw`flex`}>
+                        <Text style={tw`text-lg font-semibold`}>
+                          History of present illness:
+                        </Text>
+                        <Text style={tw`text-lg`}>
+                          {report?.history_of_present_illness}
+                        </Text>
+                      </View>
+                    )}
+                    {report?.plan && (
+                      <View style={tw`flex`}>
+                        <Text style={tw`text-lg font-semibold`}>Plan</Text>
+                        <Text style={tw`text-lg`}>{report?.plan}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View style={tw` flex gap-4`}>
+                    <View style={tw`w-full h-[1px] bg-gray-400`}></View>
+                    <View
+                      style={tw`flex flex-row items-center justify-between`}
+                    >
+                      <TouchableOpacity
+                        style={tw`bg-blue-500 p-3 px-4 rounded-lg text-black`}
+                      >
+                        <Text style={tw`text-white font-semibold`}>
+                          Generate Report
+                        </Text>
+                      </TouchableOpacity>
+                      <Feather name="download" size={24} color="black" />
+                    </View>
+                  </View>
+                </View>
+              )}
+            </>
           )}
         </View>
       </ScrollView>

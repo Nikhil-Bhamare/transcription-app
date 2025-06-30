@@ -24,7 +24,7 @@ const NetworkStatusBanner = () => {
 
     const handleConnectivityChange = async (state: any) => {
       const basicConnected =
-        state.isConnected && state.isInternetReachable !== true;
+        state.isConnected && state.isInternetReachable !== false;
       let internetWorking = basicConnected;
 
       if (basicConnected) {
