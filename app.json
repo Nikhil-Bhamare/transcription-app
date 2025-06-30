@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "transcription-app",
-    "slug": "transcription-app",
+    "name": "Medical Transcription",
+    "slug": "Medical Transcription",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/MedLogo.png",
